@@ -2,7 +2,7 @@ import os
 from tqdm import tqdm
 
 
-path = "./dataset/test"
+path = "./dataset/VCTK-Corpus-0.92/wav48_silence_trimmed"
 speakers_dirs = os.listdir(path)
 temp1, temp2, temp3 = "temp1.flac", "temp2.flac", "temp3.flac"
 
