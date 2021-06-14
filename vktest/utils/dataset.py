@@ -30,7 +30,7 @@ class VCTK(Dataset):
 		self._audio_dir = os.path.join(self._path, "wav48_silence_trimmed")
 		self._mic_id = mic_id
 		self._audio_ext = audio_ext	
-
+		self.segment_len = 128
 		self.wav2melspec = MelSpectrogram(
 			sample_rate=22050,
 			win_length=1024,
@@ -83,7 +83,16 @@ class VCTK(Dataset):
 			speaker_id,
 			f"{speaker_id}_{utterance_id}_{mic_id}{self._audio_ext}"
 		)
+
 		melspec = self._load_melspec(audio_path)
+
+		if melspec.shape[1] < self.segment_len:
+			# circular (wrap) padding in the end of spectrogram
+			tail = melspec[:, 0:(self.segment_len - melspec.shape[1])]
+			melspec = torch.cat([melspec, tail], axis=1)
+		else:
+			melspec = melspec[:, 0:self.segment_len]
+
 		return (melspec, speaker_id, utterance_id)
 
 	def __getitem__(self, n: int) -> Tuple[Tensor, str, int]:
