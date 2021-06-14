@@ -1,14 +1,13 @@
 import os
-import librosa
 import torch
+from torch import Tensor
 import torchaudio
 from torch.utils.data import Dataset
 from typing import Tuple
-from torch import Tensor
 
 from torch import nn
 from torchaudio.transforms import (
-	Vad, Resample, MelSpectrogram
+	Resample, MelSpectrogram
 )
 
 class VCTK(Dataset):
@@ -37,9 +36,6 @@ class VCTK(Dataset):
 
 		self.wav2melspec = nn.Sequential(
 			Resample(orig_freq=48000, new_freq=22050),
-			Vad(sample_rate=22050, 
-				trigger_level=-2, 
-				noise_reduction_amount=0),
 			MelSpectrogram(
 				sample_rate=22050,
 				win_length=1024,
@@ -60,7 +56,6 @@ class VCTK(Dataset):
 		self._sample_ids = []
 
 		for speaker_id in self._speaker_ids:
-
 			if speaker_id == "p280" and mic_id == "mic2":
 				continue
 
