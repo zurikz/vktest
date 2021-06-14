@@ -4,6 +4,9 @@
 
 dataset/
 
+# Jupyter
+.ipynb_checkpoints
+
 ### OSX ###
 # General
 .DS_Store
