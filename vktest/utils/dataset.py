@@ -13,7 +13,7 @@ class VCTK(Dataset):
 
 	Args:
 		root (str): Root directory where the dataset's top level directory is found.
-		train (bool): What split to use: if 'True', then 80 train speakers are being used, 
+		train (bool): What split to use: if 'True', then 80 train speakers are being used,
 					  else -- validation speakers.
 		mic_id (str): Microphone ID. Either "mic1" or "mic2". (default: "mic2")
 		audio_ext (str, optional): Audio extension. (default: ".flac")
@@ -66,7 +66,7 @@ class VCTK(Dataset):
 					continue
 
 				splitted_utterance_id = utterance_id.split("_")
-				# "for each speaker, there were 200 utterances chosen arbitrarily..."
+				# for each speaker 200 utterances choses arbitrarily
 				if int(splitted_utterance_id[1]) > 200:
 					break
 				self._sample_ids.append(splitted_utterance_id)
@@ -77,7 +77,9 @@ class VCTK(Dataset):
 		waveform = torch.clip(Tensor(waveform), -1.0, 1.0)
 		return self.wav2melspec(waveform)
 
-	def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Tuple[Tensor, str, int]:
+	def _load_sample(
+		self, speaker_id: str, utterance_id: str, mic_id: str
+	) -> Tuple[Tensor, str, int]:
 		audio_path = os.path.join(
 			self._audio_dir,
 			speaker_id,
