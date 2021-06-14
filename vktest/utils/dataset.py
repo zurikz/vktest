@@ -7,7 +7,6 @@ from torch.utils.data import Dataset
 from typing import Tuple
 from torch import Tensor
 from torchaudio.transforms import MelSpectrogram
-from torchaudio.datasets.vctk import SampleType
 
 class VCTK(Dataset):
 	"""Create custom VCTK 0.92 Dataset for AGAIN-VC training.
@@ -69,7 +68,7 @@ class VCTK(Dataset):
 				splitted_utterance_id = utterance_id.split("_")
 				# "for each speaker, there were 200 utterances chosen arbitrarily..."
 				if int(splitted_utterance_id[1]) > 200:
-					continue
+					break
 				self._sample_ids.append(splitted_utterance_id)
 
 	def _load_melspec(self, file_path) -> Tensor:
@@ -78,7 +77,7 @@ class VCTK(Dataset):
 		waveform = torch.clip(Tensor(waveform), -1.0, 1.0)
 		return self.wav2melspec(waveform)
 
-	def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
+	def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Tuple[Tensor, str, int]:
 		audio_path = os.path.join(
 			self._audio_dir,
 			speaker_id,
@@ -87,6 +86,6 @@ class VCTK(Dataset):
 		melspec = self._load_melspec(audio_path)
 		return (melspec, speaker_id, utterance_id)
 
-	def __getitem__(self, n: int) -> SampleType:
+	def __getitem__(self, n: int) -> Tuple[Tensor, str, int]:
 		speaker_id, utterance_id = self._sample_ids[n]
 		return self._load_sample(speaker_id, utterance_id, self._mic_id)
