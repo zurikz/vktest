@@ -1,12 +1,15 @@
 import os
 import librosa
-from librosa.core import audio
-from scipy.signal import waveforms
 import torch
+import torchaudio
 from torch.utils.data import Dataset
 from typing import Tuple
 from torch import Tensor
-from torchaudio.transforms import MelSpectrogram
+
+from torch import nn
+from torchaudio.transforms import (
+	Vad, Resample, MelSpectrogram
+)
 
 class VCTK(Dataset):
 	"""Create custom VCTK 0.92 Dataset for AGAIN-VC training.
@@ -31,14 +34,21 @@ class VCTK(Dataset):
 		self._mic_id = mic_id
 		self._audio_ext = audio_ext	
 		self.segment_len = 128
-		self.wav2melspec = MelSpectrogram(
-			sample_rate=22050,
-			win_length=1024,
-			n_fft=1024,
-			hop_length=256,
-			n_mels=80,
-			f_min=0,
-			f_max=11025
+
+		self.wav2melspec = nn.Sequential(
+			Resample(orig_freq=48000, new_freq=22050),
+			Vad(sample_rate=22050, 
+				trigger_level=-2, 
+				noise_reduction_amount=0),
+			MelSpectrogram(
+				sample_rate=22050,
+				win_length=1024,
+				n_fft=1024,
+				hop_length=256,
+				n_mels=80,
+				f_min=0,
+				f_max=11025
+			)
 		)
 
 		# Extracting speaker IDs from the folder structure
@@ -50,9 +60,12 @@ class VCTK(Dataset):
 		self._sample_ids = []
 
 		for speaker_id in self._speaker_ids:
+
 			if speaker_id == "p280" and mic_id == "mic2":
 				continue
+
 			utterance_dir = os.path.join(self._txt_dir, speaker_id)
+
 			for utterance_file in sorted(
 				f for f in os.listdir(utterance_dir) if f.endswith(".txt")
 			):
@@ -64,18 +77,15 @@ class VCTK(Dataset):
 				)
 				if speaker_id == "p362" and not os.path.isfile(audio_path_mic):
 					continue
-
 				splitted_utterance_id = utterance_id.split("_")
-				# for each speaker 200 utterances choses arbitrarily
+				# for each speaker 200 utterances are chosen arbitrarily
 				if int(splitted_utterance_id[1]) > 200:
 					break
 				self._sample_ids.append(splitted_utterance_id)
 
 	def _load_melspec(self, file_path) -> Tensor:
-		waveform, _ = librosa.load(file_path, sr=22050) 
-		waveform, _ = librosa.effects.trim(waveform, top_db=20)
-		waveform = torch.clip(Tensor(waveform), -1.0, 1.0)
-		return self.wav2melspec(waveform)
+		waveform, _ = torchaudio.load(file_path)
+		return self.wav2melspec(waveform[0])
 
 	def _load_sample(
 		self, speaker_id: str, utterance_id: str, mic_id: str
@@ -89,7 +99,7 @@ class VCTK(Dataset):
 		melspec = self._load_melspec(audio_path)
 
 		if melspec.shape[1] < self.segment_len:
-			# circular (wrap) padding in the end of spectrogram
+			# circular (wrap) padding at the end of a spectrogram
 			tail = melspec[:, 0:(self.segment_len - melspec.shape[1])]
 			melspec = torch.cat([melspec, tail], axis=1)
 		else:
