@@ -100,3 +100,6 @@ class VCTK(Dataset):
 	def __getitem__(self, n: int) -> Tuple[Tensor, str, int]:
 		speaker_id, utterance_id = self._sample_ids[n]
 		return self._load_sample(speaker_id, utterance_id, self._mic_id)
+
+	def __len__(self) -> int:
+		return len(self._sample_ids)
