@@ -10,8 +10,8 @@ for dir in tqdm(speakers_dirs):
 	speaker_path = os.path.join(path, dir)
 	if not os.path.isdir(speaker_path):
 		continue
-	files = [x for x in os.listdir(speaker_path)]
-	for file in tqdm(files):
+	files = sorted(os.listdir(speaker_path))
+	for file in tqdm(files[:410]):
 		file = os.path.join(speaker_path, file)
 		if file.endswith(".flac"):
 			os.popen("ffmpeg -loglevel quiet -i " + file + " -af silenceremove=1:0:-40dB -y " + temp1).read()
