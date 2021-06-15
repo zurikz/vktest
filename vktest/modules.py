@@ -1,10 +1,9 @@
-import torch
 from torch import nn
 from torch import Tensor
 from typing import Tuple
 
 
-class InstanceNorm(nn.Module):
+class InstanceNorm2d(nn.Module):
 	"""Instance normalization layer.
 	"""
 	def __init__(self) -> None:
@@ -13,16 +12,16 @@ class InstanceNorm(nn.Module):
 	def forward(self, x) -> Tuple[Tensor, Tensor, Tensor]:
 		"""
 		Args:
-			x (Tensor): (batch, channel, *)
+			x (Tensor): (batch, channel, height, width)
 
 		Returns:
-			tuple: (InstanceNorm(x), mean, std)
+			tuple: (IN(x), mean, std)
 		"""
 		batch, channel = x.shape[0], x.shape[1]
 		mean = x.view(batch, channel, -1).mean(-1)
 		std = (x.view(batch, channel, -1).var(-1) + 1e-5).sqrt()
-		mean = mean.view(batch, channel, *((len(x.shape) - 2) * [1]))
-		std = std.view(batch, channel, *((len(x.shape) - 2) * [1]))
+		mean = mean.view(batch, channel, 1, 1)
+		std = std.view(batch, channel, 1, 1)
 		x = (x - mean) / std
 		return x, mean, std
 
@@ -54,4 +53,3 @@ class AgainConv1d(nn.Module):
 	
 	def forward(self, x) -> Tensor:
 		return self.conv1d(x)
-	
