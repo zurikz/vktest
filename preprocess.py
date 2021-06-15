@@ -3,11 +3,13 @@ from tqdm import tqdm
 
 
 path = "./dataset/VCTK-Corpus-0.92/wav48_silence_trimmed"
-speakers_dirs = os.listdir(path)
+speakers_dirs = sorted(os.listdir(path))
 temp1, temp2, temp3 = "temp1.flac", "temp2.flac", "temp3.flac"
 
 for dir in tqdm(speakers_dirs):
 	speaker_path = os.path.join(path, dir)
+	if not os.path.isdir(speaker_path):
+		continue
 	files = [x for x in os.listdir(speaker_path)]
 	for file in tqdm(files):
 		file = os.path.join(speaker_path, file)
