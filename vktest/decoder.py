@@ -78,20 +78,20 @@ class Decoder(nn.Module):
 	
 	def forward(
 		self,
-		source: Tuple[Tensor, Tensor, Tensor],
+		source_content: Tensor,
 		target: Tuple[Tensor, Tensor, Tensor]
 	) -> Tensor:
 		"""Decoder's forward pass.
 
 		Args:
-			source (tuple): (content, means, stds)
+			source_content (tuple): source content representation.
+				Shape: (B, melbins, seglen)
 			target (tuple): (content, means, stds)
 				content (Tensor): (B, melbins, seglen)
 				means, stds (Tensor): (conv_blocks_num, B, melbins, 1)
 		
 		Returns:
 		"""
-		source_content, _, _ = source
 		target_content, means, stds = target
 
 		# Adaptive Instance Normalization
