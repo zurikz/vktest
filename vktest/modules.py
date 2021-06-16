@@ -12,16 +12,16 @@ class InstanceNorm2d(nn.Module):
 	def forward(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
 		"""
 		Args:
-			x (Tensor): (batch, channel, height, width)
+			x (Tensor): (batch, height, width)
 
 		Returns:
 			tuple: (IN(x), mean, std)
 		"""
-		batch, channel = x.shape[0], x.shape[1]
-		mean = x.view(batch, channel, -1).mean(-1)
-		std = (x.view(batch, channel, -1).var(-1) + 1e-5).sqrt()
-		mean = mean.view(batch, channel, 1, 1)
-		std = std.view(batch, channel, 1, 1)
+		batch = x.shape[0]
+		mean = x.view(batch, -1).mean(-1)
+		std = (x.view(batch, -1).var(-1) + 1e-5).sqrt()
+		mean = mean.view(batch, 1, 1)
+		std = std.view(batch, 1, 1)
 		x = (x - mean) / std
 		return x, mean, std
 
