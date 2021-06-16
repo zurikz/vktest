@@ -1,7 +1,8 @@
-from .modules import InstanceNorm2d, AgainConv1d 
-from typing import Tuple
 from torch import nn
 from torch import Tensor
+from typing import Tuple
+
+from .modules import InstanceNorm2d, AgainConv1d 
 
 
 class EncoderConvBlock(nn.Module):
