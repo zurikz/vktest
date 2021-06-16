@@ -9,7 +9,7 @@ class InstanceNorm2d(nn.Module):
 	def __init__(self) -> None:
 		super().__init__()
 	
-	def forward(self, x) -> Tuple[Tensor, Tensor, Tensor]:
+	def forward(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
 		"""
 		Args:
 			x (Tensor): (batch, channel, height, width)
@@ -27,6 +27,8 @@ class InstanceNorm2d(nn.Module):
 
 class AgainConv1d(nn.Module):
 	"""Conv1d layer with Xavier uniform initialization.
+	Preserves equality of L_in and L_out when padding is not specified:
+		(B, C_in, L_in) -> (B, C_out, L_out)
 	"""
 	def __init__(self, in_channels: int, out_channels: int,
 				 kernel_size: int = 1, stride: int = 1, 
@@ -51,5 +53,12 @@ class AgainConv1d(nn.Module):
 			gain=nn.init.calculate_gain('linear')
 		)
 	
-	def forward(self, x) -> Tensor:
+	def forward(self, x: Tensor) -> Tensor:
+		"""
+		Args:
+			x (Tensor): (batch, in_channels, seglen)
+
+		Returns:
+			Tensor: (batch, out_channels, seglen)
+		"""
 		return self.conv1d(x)
