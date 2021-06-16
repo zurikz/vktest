@@ -20,9 +20,7 @@ class InstanceNorm2d(nn.Module):
 		batch = x.shape[0]
 		mean = x.view(batch, -1).mean(-1)
 		std = (x.view(batch, -1).var(-1) + 1e-5).sqrt()
-		mean = mean.view(batch, 1, 1)
-		std = std.view(batch, 1, 1)
-		x = (x - mean) / std
+		x = (x - mean.view(batch, 1, 1)) / std.view(batch, 1, 1)
 		return x, mean, std
 
 class AgainConv1d(nn.Module):
