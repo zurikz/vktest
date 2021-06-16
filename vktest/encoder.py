@@ -56,7 +56,10 @@ class Encoder(nn.Module):
 		)
 		self.convblocks = nn.ModuleList(
 			conv_blocks_num * [
-				EncoderConvBlock(in_channels=hidden_size, out_channels=hidden_size)
+				EncoderConvBlock(
+					in_channels=hidden_size, 
+					out_channels=hidden_size
+				)
 			]
 		)
 		self.last_conv1d = AgainConv1d(
