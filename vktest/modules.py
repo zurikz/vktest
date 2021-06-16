@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 from torch import Tensor
 from typing import Tuple
@@ -62,3 +63,11 @@ class AgainConv1d(nn.Module):
 			Tensor: (batch, out_channels, seglen)
 		"""
 		return self.conv1d(x)
+
+class CustomSigmoid(nn.Module):
+	def __init__(self, alpha: float = 0.1) -> None:
+		super().__init__()
+		self.alpha = alpha
+
+	def forward(self, x: Tensor) -> Tensor:
+		return 1 / (1 + torch.exp(-self.alpha * x))
