@@ -3,7 +3,7 @@ from torch import nn
 from torch import Tensor
 from typing import Tuple
 
-from .modules import InstanceNorm2d, AgainConv1d 
+from .modules import InstanceNorm, AgainConv1d 
 
 
 class EncoderConvBlock(nn.Module):
@@ -50,7 +50,7 @@ class Encoder(nn.Module):
 		conv_blocks_num: int
 	) -> None:
 		super().__init__()
-		self.IN = InstanceNorm2d()
+		self.IN = InstanceNorm()
 		self.first_conv1d = AgainConv1d(
 			in_channels=melbins, out_channels=hidden_size
 		)
@@ -75,7 +75,7 @@ class Encoder(nn.Module):
 		Returns:
 			tuple:	(content, means, stds)
 				content: (batch, melbins_out, seglen)
-				means, stds: (batch, conv_blocks_num)
+				means, stds: (conv_blocks_num, batch, 1, 1)
 		"""
 		# (B, melbins, seglen) -> (B, hidden_size, seglen)
 		x = self.first_conv1d(x)
@@ -90,4 +90,4 @@ class Encoder(nn.Module):
 		# (B, hidden_size, seglen) -> (B, melbins_out, seglen)
 		content = self.last_conv1d(x)
 
-		return content, torch.stack(means, dim=1), torch.stack(stds, dim=1)
+		return content, torch.stack(means, dim=0), torch.stack(stds, dim=0)
