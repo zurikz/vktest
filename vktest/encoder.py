@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 from torch import Tensor
 from typing import Tuple
@@ -69,8 +70,9 @@ class Encoder(nn.Module):
 			x (Tensor): (batch, melbins, seglen)
 		
 		Returns:
-			tuple:	(encoder_out, means, stds)
-				encoder_out: (batch, melbins_out, seglen)
+			tuple:	(content, means, stds)
+				content: (batch, melbins_out, seglen)
+				means, stds: (batch, conv_blocks_num)
 		"""
 		# (B, melbins, seglen) -> (B, hidden_size, seglen)
 		x = self.first_conv1d(x)
@@ -83,6 +85,6 @@ class Encoder(nn.Module):
 			stds.append(std)
 		
 		# (B, hidden_size, seglen) -> (B, melbins_out, seglen)
-		x = self.last_conv1d(x)
+		content = self.last_conv1d(x)
 
-		return x, means, stds
+		return content, torch.stack(means, dim=1), torch.stack(stds, dim=1)
