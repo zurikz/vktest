@@ -32,7 +32,7 @@ class DecoderConvBlock(nn.Module):
 	
 	def forward(self, x: Tensor) -> Tensor:
 		y = self.convblock(x)
-		y += self.genblock(y)
+		y = y.clone() + self.genblock(y)
 		return x + y
 
 class Decoder(nn.Module):
