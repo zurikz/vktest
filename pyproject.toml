@@ -12,6 +12,7 @@ ipywidgets = "^7.6.3"
 pytorch-lightning = "^1.3.5"
 librosa = "^0.8.1"
 matplotlib = "^3.4.2"
+wandb = "^0.10.32"
 
 [tool.poetry.dev-dependencies]
 ipykernel = "^5.5.5"
