@@ -71,8 +71,7 @@ class Decoder(nn.Module):
 		self.gru = nn.GRU(
 			input_size=hidden_size,
 			hidden_size=hidden_size,
-			num_layers=2,
-			batch_first=True
+			num_layers=2
 		)
 		self.linear = nn.Linear(hidden_size, melbins_out)
 	
