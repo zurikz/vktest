@@ -100,7 +100,7 @@ class VCTK(Dataset):
 		else:
 			melspec = melspec[:, 0:self.segment_len]
 
-		return (melspec, speaker_id, utterance_id)
+		return melspec
 
 	def __getitem__(self, n: int) -> Tuple[Tensor, str, int]:
 		speaker_id, utterance_id = self._sample_ids[n]
