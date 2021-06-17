@@ -59,6 +59,20 @@ class LitAgainVC(pl.LightningModule):
 
         return self.decoder(source_content, target_encoded)[:, :, :source_len]
 
+    def training_step(self, batch, batch_idx):
+        x = batch
+        x_hat = self(x)
+        loss = F.l1_loss(x_hat, x)
+        self.log('train_loss', loss, on_step=True, on_epoch=True, logger=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x = batch
+        x_hat = self(x)
+        val_loss = F.l1_loss(x_hat, x)
+        self.log('val_loss', val_loss, on_epoch=True, logger=True)
+        return val_loss
+
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(
             self.parameters(),
@@ -67,15 +81,3 @@ class LitAgainVC(pl.LightningModule):
             weight_decay=0.0001,
             amsgrad=True
         )
-
-    def training_step(self, batch, batch_idx):
-        x = batch
-        x_hat = self(x)
-        loss = F.l1_loss(x_hat, x)
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        x = batch
-        x_hat = self(x)
-        val_loss = F.l1_loss(x_hat, x)
-        return val_loss
