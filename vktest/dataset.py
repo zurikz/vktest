@@ -96,11 +96,10 @@ class VCTK(Dataset):
 		if melspec.shape[1] < self.segment_len:
 			# circular (wrap) padding at the end of a spectrogram
 			tail = melspec[:, 0:(self.segment_len - melspec.shape[1])]
-			melspec = torch.cat([melspec, tail], axis=1)
-		else:
-			melspec = melspec[:, 0:self.segment_len]
+			while melspec.shape[1] < self.segment_len:
+				melspec = torch.cat([melspec, tail], axis=1)
 
-		return melspec
+		return melspec[:, :self.segment_len]
 
 	def __getitem__(self, n: int) -> Tuple[Tensor, str, int]:
 		speaker_id, utterance_id = self._sample_ids[n]
