@@ -3,6 +3,10 @@
 # Edit at https://www.gitignore.io/?templates=osx,python,pycharm,windows,visualstudio,visualstudiocode
 
 dataset/
+wandb/
+checkpoints/
+
+*.ckpt
 
 # Jupyter
 .ipynb_checkpoints
