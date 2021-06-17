@@ -38,7 +38,7 @@ class LitAgainVC(pl.LightningModule):
         Returns:
 
         """
-        source_len, target_len = source.shape[2], target.shape[2]
+        source_len = source.shape[2]
 
         if target is None:
             target = torch.cat(
@@ -46,6 +46,7 @@ class LitAgainVC(pl.LightningModule):
                 axis=2
             )
         else:
+            target_len = target.shape[2]
             if source_len % 8 != 0:
                 source = F.pad(source, (0, 8 - source_len % 8), mode='reflect')
             if target_len % 8 != 0:
@@ -60,14 +61,14 @@ class LitAgainVC(pl.LightningModule):
         return self.decoder(source_content, target_encoded)[:, :, :source_len]
 
     def training_step(self, batch, batch_idx):
-        x = batch[0]
+        x = batch
         x_hat = self(x)
         loss = F.l1_loss(x_hat, x)
         self.log('train_loss', loss, on_step=True, on_epoch=True, logger=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        x = batch[0]
+        x = batch
         x_hat = self(x)
         val_loss = F.l1_loss(x_hat, x)
         self.log('val_loss', val_loss, on_epoch=True, logger=True)
@@ -81,3 +82,4 @@ class LitAgainVC(pl.LightningModule):
             weight_decay=0.0001,
             amsgrad=True
         )
+        return optimizer
