@@ -64,14 +64,20 @@ class LitAgainVC(pl.LightningModule):
         x = batch
         x_hat = self(x)
         loss = nn.functional.l1_loss(x_hat, x)
-        self.log('train_loss', loss, on_step=True, on_epoch=True, logger=True)
+        self.log(
+            'train_loss', loss, on_step=True, 
+            on_epoch=True, prog_bar=True, logger=True
+        )
         return loss
 
     def validation_step(self, batch, batch_idx):
         x = batch
         x_hat = self(x)
         val_loss = nn.functional.l1_loss(x_hat, x)
-        self.log('val_loss', val_loss, on_epoch=True, logger=True)
+        self.log(
+            'val_loss', val_loss, on_epoch=True,
+            prog_bar=True, logger=True
+        )
         return val_loss
 
     def configure_optimizers(self):
