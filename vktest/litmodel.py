@@ -58,3 +58,24 @@ class LitAgainVC(pl.LightningModule):
         target_encoded = (self.sigmoid(target_content), target_means, target_stds)
 
         return self.decoder(source_content, target_encoded)[:, :, :source_len]
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(
+            self.parameters(),
+            lr=0.0005,
+            betas=(0.9, 0.999),
+            weight_decay=0.0001,
+            amsgrad=True
+        )
+
+    def training_step(self, batch, batch_idx):
+        x = batch
+        x_hat = self(x)
+        loss = F.l1_loss(x_hat, x)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x = batch
+        x_hat = self(x)
+        val_loss = F.l1_loss(x_hat, x)
+        return val_loss
